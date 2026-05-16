@@ -1,0 +1,18 @@
+[Unit]
+Description=Vocal Reference Generator Web App
+After=network.target
+
+[Service]
+Type=simple
+User=webadmin
+Group=webadmin
+WorkingDirectory=/home/webadmin/vocal-web
+Environment="PATH=/home/webadmin/vocal-web/venv/bin"
+Environment="PYTHONDONTWRITEBYTECODE=1"
+Environment="PYTHONUNBUFFERED=1"
+ExecStart=/home/webadmin/vocal-web/venv/bin/gunicorn -b 127.0.0.1:5000 -w 2 -t 300 --access-logfile - --error-logfile - app:app
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

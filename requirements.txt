@@ -1,0 +1,9 @@
+demucs
+pydub
+praat-parselmouth
+numpy
+soundfile
+torch
+torchaudio
+flask
+gunicorn

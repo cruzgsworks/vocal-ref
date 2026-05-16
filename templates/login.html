@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Vocal Reference Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #20b2aa 0%, #008b8b 50%, #006994 100%);
+            min-height: 100vh;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-card {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+        }
+        .login-card h1 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, #fff, #40e0d0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .login-card p {
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 24px;
+        }
+        .form-control {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+        }
+        .form-control:focus {
+            background: rgba(255,255,255,0.18);
+            border-color: #40e0d0;
+            color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(64, 224, 208, 0.25);
+        }
+        .btn-login {
+            background: linear-gradient(135deg, #20b2aa, #40e0d0);
+            border: none;
+            color: #fff;
+            width: 100%;
+            padding: 12px;
+            font-weight: 600;
+        }
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(64, 224, 208, 0.4);
+        }
+        .error-msg {
+            color: #ff6b6b;
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+        }
+        .icon-lock {
+            font-size: 3rem;
+            color: #40e0d0;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <i class="bi bi-shield-lock icon-lock"></i>
+        <h1>Vocal Reference Generator</h1>
+        <p>This page is password protected.</p>
+        {% if error %}
+        <div class="error-msg">{{ error }}</div>
+        {% endif %}
+        <form method="POST" action="login">
+            <div class="mb-3">
+                <input type="password" name="password" class="form-control" placeholder="Enter password" required autofocus>
+            </div>
+            <button type="submit" class="btn btn-login rounded-3">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Login
+            </button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocal Reference Generator</title>
+    <!-- Standard Meta -->
+    <meta name="description" content="Upload a song, make the vocals gibberish while keeping the melody. Perfect for AI music tools like Suno.">
+    <meta name="keywords" content="vocal reference, gibberish vocals, demucs, formant shift, suno, ai music">
+    <meta name="author" content="cruzgsworks.space">
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cruzgsworks.space/vocal-ref/">
+    <meta property="og:title" content="Vocal Reference Generator">
+    <meta property="og:description" content="Upload a song, make the vocals gibberish while keeping the melody. Perfect for AI music tools like Suno.">
+    <meta property="og:image" content="https://cruzgsworks.space/vocal-ref/static/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="cruzgsworks.space">
+    <!-- Twitter / X -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://cruzgsworks.space/vocal-ref/">
+    <meta property="twitter:title" content="Vocal Reference Generator">
+    <meta property="twitter:description" content="Upload a song, make the vocals gibberish while keeping the melody. Perfect for AI music tools like Suno.">
+    <meta property="twitter:image" content="https://cruzgsworks.space/vocal-ref/static/og-image.png">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="https://cruzgsworks.space/vocal-ref/static/favicon-32x32.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <base href="/vocal-ref/">
+    <style>
+        body {
+            background: linear-gradient(135deg, #20b2aa 0%, #008b8b 50%, #006994 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+        .app-container {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .brand-gradient {
+            background: linear-gradient(90deg, #fff, #40e0d0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .drop-zone {
+            border: 2px dashed rgba(255,255,255,0.3);
+            border-radius: 16px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(10px);
+        }
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: #40e0d0;
+            background: rgba(255,255,255,0.15);
+        }
+        .drop-zone .bi {
+            font-size: 3rem;
+            color: #40e0d0;
+            margin-bottom: 12px;
+        }
+        .card {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+        }
+        .card-header {
+            background: transparent;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            color: #fff;
+            font-weight: 600;
+        }
+        .form-range::-webkit-slider-thumb {
+            background: #40e0d0;
+        }
+        .form-range::-moz-range-thumb {
+            background: #40e0d0;
+        }
+        .form-range::-webkit-slider-runnable-track {
+            background: rgba(255,255,255,0.15);
+            height: 6px;
+            border-radius: 3px;
+        }
+        .form-select, .form-control {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+        }
+        .form-select:focus, .form-control:focus {
+            background: rgba(255,255,255,0.18);
+            border-color: #40e0d0;
+            color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(64, 224, 208, 0.25);
+        }
+        .form-select option {
+            background: #006994;
+            color: #fff;
+        }
+        .btn-process {
+            background: linear-gradient(135deg, #20b2aa, #40e0d0);
+            border: none;
+            box-shadow: 0 4px 15px rgba(64, 224, 208, 0.3);
+            color: #fff;
+        }
+        .btn-process:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(64, 224, 208, 0.4);
+        }
+        .btn-process:disabled {
+            opacity: 0.6;
+            color: rgba(255,255,255,0.8);
+        }
+        .btn-download {
+            background: linear-gradient(135deg, #20b2aa, #40e0d0);
+            border: none;
+            box-shadow: 0 4px 15px rgba(64, 224, 208, 0.3);
+            color: #fff;
+        }
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(64, 224, 208, 0.4);
+        }
+        .progress {
+            height: 8px;
+            background: rgba(255,255,255,0.15);
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, #20b2aa, #40e0d0);
+            transition: width 0.5s ease;
+        }
+        .text-muted-custom {
+            color: rgba(255,255,255,0.6) !important;
+        }
+        .value-badge {
+            color: #40e0d0;
+            font-weight: 600;
+            font-family: 'SF Mono', 'Courier New', monospace;
+        }
+        .hint-text {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.5);
+        }
+        .file-badge {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 10px 14px;
+        }
+        .form-text small {
+            color: rgba(255,255,255,0.6);
+        }
+        .text-secondary {
+            color: rgba(255,255,255,0.7) !important;
+        }
+        .btn-outline-secondary {
+            color: rgba(255,255,255,0.8);
+            border-color: rgba(255,255,255,0.3);
+        }
+        .btn-outline-secondary:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(255,255,255,0.5);
+            color: #fff;
+        }
+        .btn-outline-danger {
+            color: #ff6b6b;
+            border-color: rgba(255,107,107,0.5);
+        }
+        .btn-outline-danger:hover {
+            background: rgba(255,107,107,0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="text-center mb-4 pt-3">
+            <h1 class="brand-gradient fw-bold">Vocal Reference Generator</h1>
+            <p class="text-secondary">Upload a song, make the vocals gibberish, keep the melody.</p>
+        </header>
+
+        <!-- Upload Section -->
+        <div class="mb-4">
+            <div class="drop-zone" id="dropZone">
+                <i class="bi bi-cloud-upload"></i>
+                <p class="fw-semibold mb-1">Drag & drop an audio file here</p>
+                <p class="text-muted-custom small mb-0">or click to browse</p>
+                <input type="file" id="fileInput" accept=".mp3,.wav,.flac,.m4a,.ogg,.aac,.wma" hidden>
+            </div>
+            <div class="file-badge d-flex align-items-center justify-content-between mt-3" id="fileInfo" style="display: none !important;">
+                <span class="small text-truncate me-2" id="fileName"></span>
+                <button type="button" class="btn btn-outline-danger btn-sm" id="removeFile">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Settings -->
+        <div class="card mb-4">
+            <div class="card-header py-3">
+                <i class="bi bi-sliders me-2"></i>Settings
+            </div>
+            <div class="card-body">
+                <!-- Preset -->
+                <div class="mb-4">
+                    <label for="preset" class="form-label">Preset</label>
+                    <select id="preset" class="form-select">
+                        <option value="Default">Default</option>
+                        <option value="Suno Reference" selected>Suno Reference</option>
+                        <option value="Simlish">Simlish (Max Gibberish)</option>
+                        <option value="Alien/Gibberish">Alien/Gibberish</option>
+                        <option value="Subtle">Subtle</option>
+                        <option value="Vocals Only (Suno)">Vocals Only (Suno)</option>
+                    </select>
+                </div>
+
+                <!-- Formant -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label for="formant" class="form-label mb-0">Gibberish Level</label>
+                        <span class="value-badge" id="formantValue">1.40</span>
+                    </div>
+                    <input type="range" class="form-range" id="formant" min="1.0" max="2.0" step="0.05" value="1.40">
+                    <div class="d-flex justify-content-between hint-text mt-1">
+                        <span>Original</span>
+                        <span>Gibberish</span>
+                        <span>Alien</span>
+                    </div>
+                </div>
+
+                <!-- Pitch -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label for="pitch" class="form-label mb-0">Pitch Shift</label>
+                        <span class="value-badge" id="pitchValue">0.0 semitones</span>
+                    </div>
+                    <input type="range" class="form-range" id="pitch" min="-6" max="6" step="0.5" value="0.0">
+                </div>
+
+                <!-- Noise -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label for="noise" class="form-label mb-0">Noise Level</label>
+                        <span class="value-badge" id="noiseValue">-80 dB</span>
+                    </div>
+                    <input type="range" class="form-range" id="noise" min="-100" max="-40" step="1" value="-80">
+                    <div class="d-flex justify-content-between hint-text mt-1">
+                        <span>None</span>
+                        <span>Subtle</span>
+                        <span>Heavy</span>
+                    </div>
+                </div>
+
+                <!-- Vocal Gain -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label for="gain" class="form-label mb-0">Vocal Gain</label>
+                        <span class="value-badge" id="gainValue">0.0 dB</span>
+                    </div>
+                    <input type="range" class="form-range" id="gain" min="-10" max="5" step="0.5" value="0.0">
+                </div>
+
+                <!-- Pitch Range -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label for="pitchRange" class="form-label mb-0">Pitch Expression</label>
+                        <span class="value-badge" id="pitchRangeValue">1.00</span>
+                    </div>
+                    <input type="range" class="form-range" id="pitchRange" min="0.5" max="2.0" step="0.05" value="1.0">
+                    <div class="d-flex justify-content-between hint-text mt-1">
+                        <span>Flat</span>
+                        <span>Normal</span>
+                        <span>Simlish</span>
+                    </div>
+                </div>
+
+                <!-- Transpose (Fingerprint Breaker) -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label for="transpose" class="form-label mb-0">Transpose</label>
+                        <span class="value-badge" id="transposeValue">0.0 st</span>
+                    </div>
+                    <input type="range" class="form-range" id="transpose" min="-3" max="3" step="0.5" value="0.0">
+                    <div class="d-flex justify-content-between hint-text mt-1">
+                        <span>-3</span>
+                        <span>Original key</span>
+                        <span>+3</span>
+                    </div>
+                    <div class="form-text text-muted-custom mt-1">
+                        <small>Shifts the final mix pitch. Even +1 semitone breaks audio fingerprinting while keeping the song recognizable.</small>
+                    </div>
+                </div>
+
+                <!-- Vocal Style -->
+                <div class="mb-4">
+                    <label for="vocalStyle" class="form-label">Vocal Style</label>
+                    <select id="vocalStyle" class="form-select">
+                        <option value="formant">Disguised Voice (formant shift)</option>
+                        <option value="humming">Humming Melody (no words)</option>
+                    </select>
+                    <div class="form-text text-muted-custom mt-1">
+                        <small>"Humming" extracts only the melody and synthesizes a new voice with zero phonetic content.</small>
+                    </div>
+                </div>
+
+                <!-- Device & Mode -->
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <label for="device" class="form-label">Device</label>
+                        <select id="device" class="form-select">
+                            <option value="cuda" selected>CUDA (GPU)</option>
+                        <option value="cpu">CPU</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-6">
+                        <label for="mode" class="form-label">Output Mode</label>
+                        <select id="mode" class="form-select">
+                            <option value="mix">Full Mix</option>
+                            <option value="vocals_only">Vocals Only</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Process Button -->
+        <button class="btn btn-process w-100 text-white fw-semibold py-3 rounded-4 mb-4" id="processBtn" disabled>
+            <i class="bi bi-magic me-2"></i>Process
+        </button>
+
+        <!-- Progress -->
+        <div class="card mb-4" id="progressSection" style="display: none;">
+            <div class="card-body text-center py-4">
+                <div class="progress mb-3">
+                    <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+                </div>
+                <p class="text-secondary mb-1" id="progressMessage">Starting...</p>
+                <p class="value-badge fs-4 mb-0" id="progressPercent">0%</p>
+            </div>
+        </div>
+
+        <!-- Success -->
+        <div class="card mb-4 border-success" id="resultSection" style="display: none;">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-check-circle-fill text-success" style="font-size: 3.5rem;"></i>
+                <h3 class="text-success mt-3">Done!</h3>
+                <p class="text-secondary">Your gibberish vocal reference is ready.</p>
+                <a href="#" class="btn btn-download text-white fw-semibold px-4 py-2 rounded-3 mb-2" id="downloadBtn">
+                    <i class="bi bi-download me-2"></i>Download MP3
+                </a>
+                <button type="button" class="btn btn-outline-secondary w-100 mt-2" id="resetBtn">
+                    <i class="bi bi-arrow-clockwise me-2"></i>Process Another
+                </button>
+            </div>
+        </div>
+
+        <!-- Error -->
+        <div class="card mb-4 border-danger" id="errorSection" style="display: none;">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-x-circle-fill text-danger" style="font-size: 3.5rem;"></i>
+                <h3 class="text-danger mt-3">Processing Failed</h3>
+                <p class="text-secondary small text-break" id="errorMessage">Something went wrong.</p>
+                <button type="button" class="btn btn-outline-secondary w-100 mt-2" id="errorResetBtn">
+                    <i class="bi bi-arrow-clockwise me-2"></i>Try Again
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const removeFileBtn = document.getElementById('removeFile');
+        const processBtn = document.getElementById('processBtn');
+        const progressSection = document.getElementById('progressSection');
+        const progressBar = document.getElementById('progressBar');
+        const progressMessage = document.getElementById('progressMessage');
+        const progressPercent = document.getElementById('progressPercent');
+        const resultSection = document.getElementById('resultSection');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const errorSection = document.getElementById('errorSection');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorResetBtn = document.getElementById('errorResetBtn');
+
+        const presetSelect = document.getElementById('preset');
+        const formantInput = document.getElementById('formant');
+        const formantValue = document.getElementById('formantValue');
+        const pitchInput = document.getElementById('pitch');
+        const pitchValue = document.getElementById('pitchValue');
+        const noiseInput = document.getElementById('noise');
+        const noiseValue = document.getElementById('noiseValue');
+        const gainInput = document.getElementById('gain');
+        const gainValue = document.getElementById('gainValue');
+        const pitchRangeInput = document.getElementById('pitchRange');
+        const pitchRangeValue = document.getElementById('pitchRangeValue');
+        const transposeInput = document.getElementById('transpose');
+        const transposeValue = document.getElementById('transposeValue');
+        const vocalStyleSelect = document.getElementById('vocalStyle');
+        const deviceSelect = document.getElementById('device');
+        const modeSelect = document.getElementById('mode');
+
+        let currentFile = null;
+        let currentJobId = null;
+        let pollInterval = null;
+
+        const PRESETS = {
+            "Default": {"formant": 1.5, "pitch": 0.0, "pitch_range": 1.0, "noise": -75.0, "gain": -2.0, "mode": "mix", "vocal_style": "formant", "transpose": 0.0},
+            "Suno Reference": {"formant": 1.4, "pitch": 0.0, "pitch_range": 1.0, "noise": -80.0, "gain": 0.0, "mode": "mix", "vocal_style": "formant", "transpose": 0.0},
+            "Simlish": {"formant": 1.5, "pitch": 0.0, "pitch_range": 1.0, "noise": -75.0, "gain": 0.0, "mode": "vocals_only", "vocal_style": "humming", "transpose": 0.0},
+            "Alien/Gibberish": {"formant": 1.8, "pitch": 0.0, "pitch_range": 1.0, "noise": -75.0, "gain": -2.0, "mode": "mix", "vocal_style": "formant", "transpose": 0.0},
+            "Subtle": {"formant": 1.2, "pitch": 0.0, "pitch_range": 1.0, "noise": -85.0, "gain": -2.0, "mode": "mix", "vocal_style": "formant", "transpose": 0.0},
+            "Vocals Only (Suno)": {"formant": 1.4, "pitch": 0.0, "pitch_range": 1.0, "noise": -80.0, "gain": 0.0, "mode": "vocals_only", "vocal_style": "formant", "transpose": 0.0},
+        };
+
+        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) handleFile(e.target.files[0]); });
+
+        function handleFile(file) {
+            const allowed = ['.mp3', '.wav', '.flac', '.m4a', '.ogg', '.aac', '.wma'];
+            const ext = '.' + file.name.split('.').pop().toLowerCase();
+            if (!allowed.includes(ext)) { alert('Unsupported file type. Allowed: ' + allowed.join(', ')); return; }
+            currentFile = file;
+            fileName.textContent = file.name;
+            fileInfo.style.display = 'flex';
+            processBtn.disabled = false;
+        }
+
+        removeFileBtn.addEventListener('click', () => {
+            currentFile = null;
+            fileInput.value = '';
+            fileInfo.style.display = 'none';
+            processBtn.disabled = true;
+        });
+
+        function updateLabels() {
+            formantValue.textContent = parseFloat(formantInput.value).toFixed(2);
+            pitchValue.textContent = parseFloat(pitchInput.value).toFixed(1) + ' semitones';
+            noiseValue.textContent = parseInt(noiseInput.value) + ' dB';
+            gainValue.textContent = parseFloat(gainInput.value).toFixed(1) + ' dB';
+            pitchRangeValue.textContent = parseFloat(pitchRangeInput.value).toFixed(2);
+            transposeValue.textContent = parseFloat(transposeInput.value).toFixed(1) + ' st';
+        }
+
+        [formantInput, pitchInput, noiseInput, gainInput, pitchRangeInput, transposeInput].forEach(el => el.addEventListener('input', updateLabels));
+
+        presetSelect.addEventListener('change', () => {
+            const preset = PRESETS[presetSelect.value];
+            if (preset) {
+                formantInput.value = preset.formant;
+                pitchInput.value = preset.pitch;
+                pitchRangeInput.value = preset.pitch_range;
+                noiseInput.value = preset.noise;
+                gainInput.value = preset.gain;
+                transposeInput.value = preset.transpose;
+                modeSelect.value = preset.mode;
+                vocalStyleSelect.value = preset.vocal_style;
+                updateLabels();
+            }
+        });
+
+        processBtn.addEventListener('click', async () => {
+            if (!currentFile) return;
+            processBtn.disabled = true;
+            processBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+            resultSection.style.display = 'none';
+            errorSection.style.display = 'none';
+            progressSection.style.display = 'block';
+
+            const formData = new FormData();
+            formData.append('file', currentFile);
+            formData.append('formant_ratio', formantInput.value);
+            formData.append('pitch_shift', pitchInput.value);
+            formData.append('pitch_range', pitchRangeInput.value);
+            formData.append('noise_db', noiseInput.value);
+            formData.append('vocal_gain', gainInput.value);
+            formData.append('transpose', transposeInput.value);
+            formData.append('device', deviceSelect.value);
+            formData.append('mode', modeSelect.value);
+            formData.append('vocal_style', vocalStyleSelect.value);
+
+            try {
+                const response = await fetch('api/upload', { method: 'POST', body: formData });
+                const data = await response.json();
+                if (data.error) { showError(data.error); return; }
+                currentJobId = data.job_id;
+                startPolling();
+            } catch (err) { showError('Upload failed: ' + err.message); }
+        });
+
+        function startPolling() {
+            if (pollInterval) clearInterval(pollInterval);
+            pollInterval = setInterval(async () => {
+                if (!currentJobId) return;
+                try {
+                    const response = await fetch('api/status/' + currentJobId);
+                    const data = await response.json();
+                    if (data.error) { showError(data.error); return; }
+                    progressBar.style.width = data.progress + '%';
+                    progressMessage.textContent = data.message;
+                    progressPercent.textContent = data.progress + '%';
+                    if (data.status === 'completed') { clearInterval(pollInterval); showResult(); }
+                    else if (data.status === 'error') { clearInterval(pollInterval); showError(data.message || 'Processing failed'); }
+                } catch (err) { console.error('Poll error:', err); }
+            }, 1000);
+        }
+
+        function showResult() {
+            progressSection.style.display = 'none';
+            resultSection.style.display = 'block';
+            downloadBtn.href = 'api/download/' + currentJobId;
+            processBtn.disabled = false;
+            processBtn.innerHTML = '<i class="bi bi-magic me-2"></i>Process';
+        }
+
+        function showError(msg) {
+            progressSection.style.display = 'none';
+            errorSection.style.display = 'block';
+            errorMessage.textContent = msg;
+        }
+
+        function resetAll() {
+            currentFile = null;
+            currentJobId = null;
+            fileInput.value = '';
+            fileInfo.style.display = 'none';
+            progressSection.style.display = 'none';
+            resultSection.style.display = 'none';
+            errorSection.style.display = 'none';
+            processBtn.disabled = true;
+            processBtn.innerHTML = '<i class="bi bi-magic me-2"></i>Process';
+            progressBar.style.width = '0%';
+            progressMessage.textContent = 'Starting...';
+            progressPercent.textContent = '0%';
+            if (pollInterval) clearInterval(pollInterval);
+        }
+
+        resetBtn.addEventListener('click', resetAll);
+        errorResetBtn.addEventListener('click', resetAll);
+        updateLabels();
+    </script>
+</body>
+</html>
