@@ -217,7 +217,7 @@ sudo apt install ffmpeg
 
 MIT License - see [LICENSE](LICENSE) file for details.
 
-Copyright (c) 2024 cruzgsworks
+Copyright (c) 2026 cruzgsworks
 
 ## Credits
 
